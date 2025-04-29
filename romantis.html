@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Untukmu, Cintaku</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to top right, #ffdee9, #b5fffc);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #5c4b51;
+    }
+
+    #playBtn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #ffb3c1;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    .message-box {
+      position: absolute;
+      z-index: 10;
+      max-width: 90%;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      animation: fadeIn 3s ease-in-out;
+    }
+
+    .message-box h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    .message-box p {
+      font-size: 1.2em;
+      margin: 0;
+    }
+
+    .marquee {
+      margin-top: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+
+    .marquee p {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 15s linear infinite;
+      font-style: italic;
+      font-size: 1em;
+      color: #7a4e56;
+    }
+
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <button id="playBtn">▶️ Mainkan Musik</button>
+
+  <div class="message-box">
+    <h1>Untukmu, yang Selalu di Hatiku 💖</h1>
+    <p>Aku mungkin tidak bisa memberi segalanya, tapi cintaku untukmu akan selalu nyata dan abadi.</p>
+    <div class="marquee">
+      <p>Setiap detik bersamamu adalah anugerah yang tak ternilai. Aku mencintaimu, hari ini, esok, dan selamanya.</p>
+    </div>
+  </div>
+
+  <canvas id="hearts"></canvas>
+  <audio id="bgMusic" src="https://www.bensound.com/bensound-music/bensound-love.mp3" loop></audio>
+
+  <script>
+    const canvas = document.getElementById('hearts');
+    const ctx = canvas.getContext('2d');
+    let hearts = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    function randomColor() {
+      const colors = ['#ff6f91', '#ffb3c1', '#ffc2d1', '#ff9a9e', '#fcbad3'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    class Heart {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = -20;
+        this.size = Math.random() * 20 + 10;
+        this.speed = Math.random() * 2 + 1;
+        this.color = randomColor();
+        this.alpha = Math.random() * 0.5 + 0.5;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        const x = this.x, y = this.y, s = this.size;
+        ctx.moveTo(x, y);
+        ctx.bezierCurveTo(x, y - s / 2, x - s, y - s / 2, x - s, y);
+        ctx.bezierCurveTo(x - s, y + s, x, y + s * 1.5, x, y + s * 2);
+        ctx.bezierCurveTo(x, y + s * 1.5, x + s, y + s, x + s, y);
+        ctx.bezierCurveTo(x + s, y - s / 2, x, y - s / 2, x, y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      update() {
+        this.y += this.speed;
+        if (this.y > canvas.height + this.size) {
+          this.y = -20;
+          this.x = Math.random() * canvas.width;
+        }
+        this.draw();
+      }
+    }
+
+    function initHearts() {
+      for (let i = 0; i < 60; i++) {
+        hearts.push(new Heart());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hearts.forEach(heart => heart.update());
+      requestAnimationFrame(animate);
+    }
+
+    initHearts();
+    animate();
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      const audio = document.getElementById('bgMusic');
+      audio.play();
+    });
+  </script>
+</body>
+</html>
